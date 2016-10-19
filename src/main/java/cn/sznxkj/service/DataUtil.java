@@ -23,17 +23,20 @@ public class DataUtil {
 	static List<Object> auserList = new ArrayList<>();
 	@PostConstruct
 	public void refreshFieldListForEver() {
-		Runnable r = ()-> {
-			while(true) {
-				refreshFieldList();
-				refreshDevData();
-				refreshWebGetDevTypeList();
-				refreshWebDeviceList();
-				refreshWebUserList();
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					refreshFieldList();
+					refreshDevData();
+					refreshWebGetDevTypeList();
+					refreshWebDeviceList();
+					refreshWebUserList();
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		};
