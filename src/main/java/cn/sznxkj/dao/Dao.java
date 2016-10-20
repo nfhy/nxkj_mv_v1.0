@@ -22,7 +22,7 @@ public class Dao implements DaoInterface{
 	public List<Map<String, Object>> query(String sql, Object ...args) {
 		List<Map<String, Object>> reList = null;
 		try{
-			reList = jdbcTemplate.queryForList(sql, args);
+			reList = jdbcTemplate.queryForList(sql.toLowerCase(), args);
 		}
 		catch (Exception e) {
 			System.out.println("查询出错，" + sql);
@@ -34,7 +34,7 @@ public class Dao implements DaoInterface{
 	@Override
 	public boolean update(String sql, Object ... args) {
 		try {
-			jdbcTemplate.update(sql, args);
+			jdbcTemplate.update(sql.toLowerCase(), args);
 			return true;
 		}
 		catch (Exception e) {
@@ -48,7 +48,7 @@ public class Dao implements DaoInterface{
 	public int count(String sql, Object ... args) {
 		int count = -1;
 		try {
-			List list = jdbcTemplate.queryForList(sql, args);
+			List list = jdbcTemplate.queryForList(sql.toLowerCase(), args);
 			count = list.size();
 		}
 		catch(Exception e) {
@@ -67,7 +67,7 @@ public class Dao implements DaoInterface{
 			public Boolean doInTransaction(TransactionStatus status) {
 				try{
 					for (String sql : sqlList) {
-						jdbcTemplate.update(sql);
+						jdbcTemplate.update(sql.toLowerCase());
 					}
 					return true;
 				}

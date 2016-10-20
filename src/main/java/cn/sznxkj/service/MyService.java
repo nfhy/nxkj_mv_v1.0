@@ -49,21 +49,21 @@ public class MyService implements ServiceInterface {
 			reMap.put("resCode", "100007");//参数不能为空，疑似攻击
 			return reMap;
 		}
-		List<Map<String, Object>> userList = dao.query("SELECT u.userId,u.nickName,u.role,u.recvWarn,u.enable,u.tel FROM users u where u.name=? and u.pwd=?".toUpperCase(), userName, passWord);
+		List<Map<String, Object>> userList = dao.query("SELECT u.userId,u.nickName,u.role,u.recvWarn,u.enable,u.tel FROM users u where u.name=? and u.pwd=?", userName, passWord);
 		if (ObjectUtils.isEmpty(userList)) {
 			reMap.put("resCode", "100003");//用户名密码错误
 			return reMap;
 		}
 		Map<String, Object> user = userList.get(0);
-		int enable = (int) user.get("enable".toUpperCase());
+		int enable = (int) user.get("enable");
 		if (enable == 0) {
 			reMap.put("resCode", "100012");//用户停用，无法登陆
 			return reMap;
 		}
-		int role = (int) user.get("role".toUpperCase());
-		int bRecvWarn = (int) user.get("recvWarn".toUpperCase());
-		String nickName = (String) user.get("nickName".toUpperCase());
-		String tel = (String) user.get("tel".toUpperCase());
+		int role = (int) user.get("role");
+		int bRecvWarn = (int) user.get("recvWarn");
+		String nickName = (String) user.get("nickName");
+		String tel = (String) user.get("tel");
 		reMap.put("role", role);
 		reMap.put("bRecvWarn", bRecvWarn);
 		reMap.put("nickName", nickName);
@@ -72,7 +72,7 @@ public class MyService implements ServiceInterface {
 		reMap.put("token", UUID.randomUUID().toString());
 		return reMap;
 	}
-	
+
 	@Override
 	public Map updateJpushId(Map data) {
 		Map<String, Object> reMap = new HashMap<>();
@@ -83,7 +83,7 @@ public class MyService implements ServiceInterface {
 		dao.update("update users u set u.jpushid=? where u.name=?", id, userName);
 		return reMap;
 	}
-	
+
 	/*
 	 * {"msg":"webGetDevTypeList",
 	 * "data":{"resCode":"0","desc":"操作完成",”cmdToken”:”xxxxx”,
@@ -97,7 +97,7 @@ public class MyService implements ServiceInterface {
 		reMap.put("devTypeList", DataUtil.devTypeList);
 		return reMap;
 	}
-	
+
 	/*
 	 * {"msg":"webField",
 	 * "data":{"resCode":"0","desc":"操作完成","fieldIndex":0,”cmdToken”:”xxxxx”,
@@ -129,7 +129,7 @@ public class MyService implements ServiceInterface {
 		reMap.put("result", fieldList);
 		return reMap;
 	}
-	
+
 	/**
 	 * {"msg":"fieldMgr","data":
 	 * {"token”:”xxxx” ,”cmd”:1,
@@ -148,7 +148,7 @@ public class MyService implements ServiceInterface {
 		boolean isEdit = detail.containsKey("fieldIndex");
 		String fieldDesc = (String) detail.get("fieldDesc");
 		String fieldName = (String) detail.get("fieldName");
-		List userList = (List) detail.get("userList");
+		//List userList = (List) detail.get("userList");
 		if (StringUtils.isEmpty(fieldName) || StringUtils.isEmpty(fieldDesc)) {
 			reMap.put("resCode", "100007");//数据格式错误
 			return reMap;
@@ -160,17 +160,18 @@ public class MyService implements ServiceInterface {
 				reMap.put("resCode", "100009");//修改失败
 				return reMap;
 			}
-			List fieldList = dao.query("select max(fieldId) id from field".toUpperCase());
+			List fieldList = dao.query("select max(fieldId) id from field");
 			Map newField = (Map) fieldList.get(0);
-			int newFieldIndex = (int) newField.get("id".toUpperCase());
+			int newFieldIndex = (int) newField.get("id");
 			List<String> sqlList = new ArrayList<>();
 			String sql2 = "delete from uservsfield where fieldid='"+newFieldIndex+"'";
 			sqlList.add(sql2);
+			/*
 			if (null != userList) {
 				for (Object userName : userList) {
 					sqlList.add("insert into uservsfield(userName,fieldId) values('"+userName+"', "+newFieldIndex+")");
 				}
-			}
+			}*/
 			dao.batchUpdate(sqlList);
 		}
 		return reMap;
@@ -197,16 +198,16 @@ public class MyService implements ServiceInterface {
 			reMap.put("resCode", "100007");//数据格式错误
 			return reMap;
 		}
-		int count = dao.count("select 1 from field where fieldId = ?".toUpperCase(), fieldIndex);
+		int count = dao.count("select 1 from field where fieldId = ?", fieldIndex);
 		if (count <= 0) {
 			reMap.put("resCode", "100014");//园地不存在
 			return reMap;
 		}
 		List<String> sqlList = new ArrayList<>();
 		//园地更新语句
-		String fieldSql = ("update field set fieldName='"+fieldName+"', fieldDesc='"+fieldDesc+"' where fieldId="+fieldIndex).toUpperCase();
+		String fieldSql = ("update field set fieldName='"+fieldName+"', fieldDesc='"+fieldDesc+"' where fieldId="+fieldIndex);
 		sqlList.add(fieldSql);
-		
+
 		List<Object> devIndexList = new ArrayList<>();
 		List<Object> tmp = new ArrayList<>();
 		//处理园地关联设备的标准值
@@ -224,7 +225,7 @@ public class MyService implements ServiceInterface {
 				int channelId = devIndex%100;
 				String sql = "update devices set c:index_fieldid=" + fieldIndex + ", c:index_max=" + dev.get("max") + ", c:index_min=" + dev.get("min") + " where devId="+devId;
 				sql = sql.replaceAll(":index", ""+channelId);
-				sqlList.add(sql.toUpperCase());
+				sqlList.add(sql);
 				System.out.println(sql);
 			}
 		}
@@ -248,7 +249,7 @@ public class MyService implements ServiceInterface {
 	 * {"devIndex":1001,"devName":"1号数据采集仪","devLocate":"1号农田",
 	 * "devTypeIndex":6,"devPower":"1","devDesc":"设备描述1",
 	 * ”channelDevList”:[{“devIndex”:100100,”devTypeIndex”:5,”fieldIndex”:1}
-	 * 
+	 *
 	 * devIndex=0 没有通道设备
 	 * fieldIndex=0没有关联园地
 	 */
@@ -256,10 +257,10 @@ public class MyService implements ServiceInterface {
 	public Map queryWebDeviceList() {
 		Map<String, Object> reMap = new HashMap<>();
 		reMap.putAll(prototypeReMap);
-		reMap.put("result", DataUtil.webDevData);
+		reMap.put("result", DataUtil.deviceList);
 		return reMap;
 	}
-	
+
 	/*
 	 * //{"msg":"devMgr",
     // "data":{"token”:”xxxx” ,”cmd”:1,
@@ -286,12 +287,12 @@ public class MyService implements ServiceInterface {
 		int devIndex = 0;
 		if (!isEdit) {
 			StringBuilder sb = new StringBuilder("insert into devices(devName,devTypeId,devDesc,devLocate,userName,devPower,tag)");
-			StringBuilder sb1 = new StringBuilder("values(?,4,?,?,'',0,?)");
+			StringBuilder sb1 = new StringBuilder("values(?,1,?,?,'',0,?)");
 			String sql = sb.toString() + sb1.toString();
 			String tag = "" + System.currentTimeMillis() + new java.util.Random().nextInt(1000);
-			update = dao.update(sql.toUpperCase(), devName, devDesc, devLocate, tag);
+			update = dao.update(sql, devName, devDesc, devLocate, tag);
 			if (update) {
-				List devList = dao.query("select devid id from devices where tag=?".toUpperCase(), tag);
+				List devList = dao.query("select devid id from devices where tag=?", tag);
 				Map idMap = (Map) devList.get(0);
 				devIndex = (int) idMap.get("ID");
 			}
@@ -328,7 +329,7 @@ public class MyService implements ServiceInterface {
 			sb.append(tmp.replaceAll(":index", ""+i));
 		}
 		sb.append(" where devId = " + devIndex);
-		update = dao.update(sb.toString().toUpperCase());
+		update = dao.update(sb.toString());
 		if (update) {
 			List<Object> devIndexList = new ArrayList<>();
 			Map<String, Object> devMap = new HashMap<>();
@@ -354,7 +355,7 @@ public class MyService implements ServiceInterface {
 		reMap.put("result", result);
 		return reMap;
 	}
-	
+
 	/**
 	 * {"msg”:"webUserList",
 	 * "data":{"resCode":"0","desc":"操作完成",”cmdToken”:”xxxxx”,
@@ -502,7 +503,7 @@ public class MyService implements ServiceInterface {
 	 * ,
 	 * "devTypeList":
 	 * [{“devTypeIndex”:1,”devTypeName”:”DO”,”paramName”:”mg/L”,”min”:-40,”max”:100}]
-	 * 
+	 *
 	 */
 	@Override
 	public Map queryAppFields(String userName) {
@@ -531,21 +532,21 @@ public class MyService implements ServiceInterface {
 		tmpFields.put("msg", "appFields");
 		return tmpFields;
 	}
-	
+
 	/**
 	 * 发送HttpPost请求
-	 * 
+	 *
 	 * @param strURL
 	 *            服务地址
 	 * @param params
 	 *            json字符串,例如: "{ \"id\":\"12345\" }" ;其中属性名必须带双引号<br/>
 	 * @return 成功:返回json字符串<br/>
-	 * 
+	 *
 	 * {"message":"devModify","detail":[{"devId":101},{"devId":102}]}
 	 * {"message":"fieldModify","detail":[{"fieldId":1}]}
 	 */
 	private static final String strURL = "http://119.29.148.244:9990";
-	
+
 	private static String post(JSONObject json) {
 		PrintWriter out = null;
         BufferedReader in = null;
@@ -595,24 +596,24 @@ public class MyService implements ServiceInterface {
         }
         return result;
 	}
-	
+
 	private Double roundDouble(Double d) {
 		java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
 		String str = myformat.format(d);
 		return Double.parseDouble(str);
 	}
-	
+
 	private List queryDevDataByUser(String userName) {
 		Map resultMap = new HashMap<>();
 		List result = new ArrayList<>();
-		String sql = "SELECT fieldid FROM uservsfield WHERE username=?".toUpperCase();
+		String sql = "SELECT fieldid FROM uservsfield WHERE username=?";
 		List fieldidList = dao.query(sql, userName);
 		if (ObjectUtils.isEmpty(fieldidList)) {
 			return new ArrayList<>();
 		}
 		for (int i = 0; i <= fieldidList.size()-1; i++) {
 			Map<String, Object> fieldIdMap = (Map) fieldidList.get(i);
-			int fieldid = (int) fieldIdMap.get("fieldid".toUpperCase());
+			int fieldid = (int) fieldIdMap.get("fieldid");
 			resultMap.put(fieldid, DataUtil.webDevData.get(fieldid));
 		}
 
