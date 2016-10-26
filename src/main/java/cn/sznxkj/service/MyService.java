@@ -450,9 +450,9 @@ public class MyService implements ServiceInterface {
 		String endTime = (String) data.get("endTime");
 		int space = Integer.parseInt("" + data.get("space"));
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		int devTypeIndex = DataUtil.deviceAndTypeTable.get("" + devIndex);
+		String tableName = DataUtil.deviceTypeAndTableNameTable.get(devTypeIndex);
 		if (space == 1) {
-			int devTypeIndex = DataUtil.deviceAndTypeTable.get("" + devIndex);
-			String tableName = DataUtil.deviceTypeAndTableNameTable.get(devTypeIndex);
 			String sql = "SELECT val,warn,TIME FROM :devType v WHERE devid="+devIndex+" AND UNIX_TIMESTAMP(TIME) > UNIX_TIMESTAMP('"+startTime+"') ORDER BY TIME LIMIT 2048";
 			List dataList = dao.query(sql.replace(":devType", tableName));
 			for (int i = 0; i <= dataList.size() - 1; i++) {
@@ -476,8 +476,7 @@ public class MyService implements ServiceInterface {
 			else {
 				sql = "SELECT MAX(val) MAX, MIN(val) MIN, AVG(val) AVG,CONCAT(SUBSTR(TIME,1,13),' 00:00:00') TIME FROM :devType v WHERE devid="+devIndex+" AND UNIX_TIMESTAMP(TIME) > UNIX_TIMESTAMP('"+startTime+"') AND UNIX_TIMESTAMP(TIME) < UNIX_TIMESTAMP('"+endTime+"') GROUP BY SUBSTR(TIME,1,10) ORDER BY TIME LIMIT 10000;";
 			}
-			List dataList = dao.query(sql.replace(":devType", "DO"));
-			dataList.addAll(dao.query(sql.replace(":devType", "PH")));
+			List dataList = dao.query(sql.replace(":devType", tableName));
 			for (int i = 0; i <= dataList.size() - 1; i++) {
 				Map<String, Object> adata = (Map) dataList.get(i);
 				Map<String, Object> aresult = new HashMap<>();
@@ -517,7 +516,7 @@ public class MyService implements ServiceInterface {
 			Map field = (Map) fields.get(i);
 			int fieldIndex = (int) field.get("fieldIndex");
 			List devList = (List) field.get("devList");
-			List devDataList = (List) DataUtil.webDevData.get(fieldIndex);
+			List devDataList = (List) DataUtil.webDevData.get("" + fieldIndex);
 			for (int j = 0; j<=devList.size()-1; j++) {
 				Map<String, Object> dev = (Map) devList.get(j);
 				int devIndex = (int) dev.get("devIndex");

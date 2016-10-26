@@ -103,7 +103,7 @@ public class DataUtil {
 				Map data = (Map) dataList.get(i);
 				Date time = (Date) data.get("time");
 				int devIndex = (int) data.get("devid");
-				int fieldIndex = (int) data.get("fieldid");
+				String fieldIndex = "" + data.get("fieldid");
 				String val = data.get("val") + "";
 				int warn = (int) data.get("warn");
 				Map<String, Object> dev = new HashMap<>();
@@ -118,7 +118,7 @@ public class DataUtil {
 				else {
 					List<Object> devList = new ArrayList<>();
 					devList.add(dev);
-					resultMap.put("" + fieldIndex, devList);
+					resultMap.put(fieldIndex, devList);
 				}
 			}
 		}
