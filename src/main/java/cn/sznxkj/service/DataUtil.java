@@ -3,6 +3,7 @@ package cn.sznxkj.service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,8 @@ public class DataUtil {
 	static List<Object> devTypeList = new ArrayList<>();
 	static List<Object> deviceList = new ArrayList<>();
 	static List<Object> auserList = new ArrayList<>();
+	static Map<String, Integer> deviceAndTypeTable = new HashMap<>();
+	static Map<Integer, String> deviceTypeAndTableNameTable = new HashMap<>();
 	@PostConstruct
 	public void refreshFieldListForEver() {
 		Runnable r = new Runnable() {
@@ -124,8 +127,9 @@ public class DataUtil {
 
 	private void refreshWebGetDevTypeList() {
 		List<Map<String, Object>> typeList =
-				dao.query("SELECT D.DEVTYPEID,D.DEVTYPENAME,D.PARAMNAME,D.MAX,D.MIN FROM DEVICETYPE D ORDER BY D.DEVTYPEID");
+				dao.query("SELECT D.DEVTYPEID,D.DEVTYPENAME,D.PARAMNAME,D.MAX,D.MIN,D.TABLENAME FROM DEVICETYPE D ORDER BY D.DEVTYPEID");
 		devTypeList = new ArrayList<>();
+		deviceTypeAndTableNameTable = new HashMap<>();
 		if (!ObjectUtils.isEmpty(typeList)) {
 			for (Map<String, Object> devType : typeList) {
 				Map<String, Object> devTypeMap = new HashMap<>();
@@ -134,18 +138,22 @@ public class DataUtil {
 				String paramName = (String) devType.get("paramName");
 				double max = (double) devType.get("max");
 				double min = (double) devType.get("min");
+				String tableName = (String)devType.get("tableName");
 				devTypeMap.put("devTypeIndex", devTypeIndex);
 				devTypeMap.put("paramName", paramName);
 				devTypeMap.put("devTypeName", devTypeName);
 				devTypeMap.put("max", max);
 				devTypeMap.put("min", min);
+				devTypeMap.put("tableName", tableName);
 				devTypeList.add(devTypeMap);
+				deviceTypeAndTableNameTable.put(devTypeIndex, tableName);
 			}
 		}
 	}
 
 	private void refreshWebDeviceList() {
 		deviceList = new ArrayList<>();
+		deviceAndTypeTable = new HashMap<>();
 		String sql = "SELECT devid,devname,devtypeid,devdesc,devlocate,username,devpower,"+
 				"c0_devname,c0_devtypeid,c0_fieldid,c0_max,c0_min"+
 				",c1_devname,c1_devtypeid,c1_fieldid,c1_max,c1_min"+
@@ -177,6 +185,7 @@ public class DataUtil {
 					Map<String, Object> channelDevMap = new HashMap<>();
 					int channelTypeIndex = (int) dev.get(("c"+d+"_devtypeid"));
 					int channelDevIndex = devIndex*100 + d;
+					deviceAndTypeTable.put(channelDevIndex + "", channelTypeIndex);
 					int fieldIndex = (int) dev.get(("c" + d + "_fieldid"));
 					double max = Double.parseDouble(dev.get("c" + d + "_max") + "");
 					double min = Double.parseDouble(dev.get("c" + d + "_min") + "");

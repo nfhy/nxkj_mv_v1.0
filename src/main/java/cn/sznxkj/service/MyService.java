@@ -11,7 +11,9 @@ import java.util.*;
 
 import javax.annotation.Resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mysql.jdbc.DatabaseMetaDataUsingInfoSchema;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -443,15 +445,16 @@ public class MyService implements ServiceInterface {
 			return reMap;
 		}
 		List result = new ArrayList<>();
-		int devIndex = (int) data.get("devIndex");
+		int devIndex = (int) data.get("devIndex");//设备5位id 数采仪+通道
 		String startTime = (String) data.get("startTime");
 		String endTime = (String) data.get("endTime");
 		int space = Integer.parseInt("" + data.get("space"));
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		if (space == 1) {
+			int devTypeIndex = DataUtil.deviceAndTypeTable.get("" + devIndex);
+			String tableName = DataUtil.deviceTypeAndTableNameTable.get(devTypeIndex);
 			String sql = "SELECT val,warn,TIME FROM :devType v WHERE devid="+devIndex+" AND UNIX_TIMESTAMP(TIME) > UNIX_TIMESTAMP('"+startTime+"') ORDER BY TIME LIMIT 2048";
-			List dataList = dao.query(sql.replace(":devType", "DO"));
-			dataList.addAll(dao.query(sql.replace(":devType", "PH")));
+			List dataList = dao.query(sql.replace(":devType", tableName));
 			for (int i = 0; i <= dataList.size() - 1; i++) {
 				Map<String, Object> adata = (Map) dataList.get(i);
 				Map<String, Object> aresult = new HashMap<>();
@@ -613,12 +616,12 @@ public class MyService implements ServiceInterface {
 		}
 		for (int i = 0; i <= fieldidList.size()-1; i++) {
 			Map<String, Object> fieldIdMap = (Map) fieldidList.get(i);
-			int fieldid = (int) fieldIdMap.get("fieldid");
+			String fieldid = "" + fieldIdMap.get("fieldid");
 			resultMap.put(fieldid, DataUtil.webDevData.get(fieldid));
 		}
 
 		for (Object key : resultMap.keySet()) {
-			int fieldIndex = (int) key;
+			int fieldIndex = Integer.parseInt("" + key);
 			Map<String, Object> tmp = new HashMap<>();
 			tmp.put("fieldIndex", fieldIndex);
 			tmp.put("devList", resultMap.get(key));
