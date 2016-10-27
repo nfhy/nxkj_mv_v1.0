@@ -72,6 +72,24 @@ public class MyService implements ServiceInterface {
 		reMap.put("tel", tel);
 		reMap.put("enable", enable);
 		reMap.put("token", UUID.randomUUID().toString());
+		Boolean isApp = data.containsKey("isApp")?(Boolean)data.get("isApp"):false;
+		if (isApp)
+			this.setLoginStatus(userName, true);
+		return reMap;
+	}
+
+	@Override
+	public Map logOut(Map data) {
+		Map<String, Object> reMap = new HashMap<>();
+		reMap.putAll(prototypeReMap);
+		String userName = (String) data.get("userName");
+		if (StringUtils.isEmpty(userName)) {
+			reMap.put("resCode", "100007");//参数不能为空，疑似攻击
+			return reMap;
+		}
+		Boolean isApp = data.containsKey("isApp")?(Boolean)data.get("isApp"):false;
+		if (isApp)
+			this.setLoginStatus(userName, false);
 		return reMap;
 	}
 
@@ -652,4 +670,10 @@ public class MyService implements ServiceInterface {
 		dao.update(sql1);
 		return reMap;
 	}
+
+	private void setLoginStatus(String name, boolean isLogin) {
+		String sql = "update users set blogin=? where name=?";
+		dao.update(sql, isLogin?1:0, name);
+	}
+
 }

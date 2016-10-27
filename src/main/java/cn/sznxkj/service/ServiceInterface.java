@@ -6,6 +6,8 @@ public interface ServiceInterface {
 
 	Map queryLogin(Map data);
 
+	public Map logOut(Map data);
+
 	Map queryWebGetDevTypeList();
 
 	Map updateFieldMgr(Map data);

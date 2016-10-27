@@ -26,7 +26,7 @@ public class ExposedController {
 	private static Map<String, Map<String, Object>> tokenMap = new HashMap<>();
 	@Autowired
 	private MyService service;
-	
+
 	@RequestMapping("/input.do")
 	@ResponseBody
 	public void input(HttpServletRequest req, HttpServletResponse res, @RequestBody String json) throws Exception {
@@ -69,70 +69,78 @@ public class ExposedController {
 			try{
 				System.out.println(msg);
 				switch (msg) {
-				case "login": {
-					reData = service.queryLogin(data);
-					if ("0".equals(reData.get("resCode"))) {
-						userName = (String) data.get("userName"); 
-						tokenMap.put(userName, reData);
+					case "login": {
+						reData = service.queryLogin(data);
+						if ("0".equals(reData.get("resCode"))) {
+							userName = (String) data.get("userName");
+							tokenMap.put(userName, reData);
+						}
+						break;
 					}
-					break;
-				}
-				case "webGetDevTypeList" : {
-					reData = service.queryWebGetDevTypeList();
-					break;
-				}
-				
-				case "webField" : {
-					reData = service.queryWebField(userName);
-					break;
-				}
-				case "fieldMgr" : {
-					reData = service.updateFieldMgr(data);
-					break;
-				}
-				case "webModifyField" : {
-					reData = service.updateWebModifyField(data);
-					break;
-				}
-				case "webDeviceList" : {
-					reData = service.queryWebDeviceList();
-					break;
-				}
-				case "devMgr" : {
-					reData = service.updateDevMgr(data);
-					break;
-				}
-				case "webUserList" : {
-					reData = service.queryWebUserList();
-					break;
-				}
-				case "userMgr" : {
-					reData = service.updateUserMgr(data);
-					break;
-				}
-				case "webDevData" : {
-					reData = service.queryWebDevData(userName);
-					break;
-				}
-				case "webHistory" : {
-					reData = service.queryWebHistory(data);
-					break;
-				}
-				case "appFields" : {
-					reData = service.queryAppFields(userName);
-					break;
-				}
-				case "appUserMgr" : {
-					reData = service.updateAppUserMgr(data);
-					break;
-				}
-				case "jpushId" : {
-					reData = service.updateJpushId(data);
-					break;
-				}
-				default : {
-					break;
-				}
+					case "logOut": {
+						reData = service.logOut(data);
+						if ("0".equals(reData.get("resCode"))) {
+							userName = (String) data.get("userName");
+							tokenMap.put(userName, reData);
+						}
+						break;
+					}
+					case "webGetDevTypeList" : {
+						reData = service.queryWebGetDevTypeList();
+						break;
+					}
+
+					case "webField" : {
+						reData = service.queryWebField(userName);
+						break;
+					}
+					case "fieldMgr" : {
+						reData = service.updateFieldMgr(data);
+						break;
+					}
+					case "webModifyField" : {
+						reData = service.updateWebModifyField(data);
+						break;
+					}
+					case "webDeviceList" : {
+						reData = service.queryWebDeviceList();
+						break;
+					}
+					case "devMgr" : {
+						reData = service.updateDevMgr(data);
+						break;
+					}
+					case "webUserList" : {
+						reData = service.queryWebUserList();
+						break;
+					}
+					case "userMgr" : {
+						reData = service.updateUserMgr(data);
+						break;
+					}
+					case "webDevData" : {
+						reData = service.queryWebDevData(userName);
+						break;
+					}
+					case "webHistory" : {
+						reData = service.queryWebHistory(data);
+						break;
+					}
+					case "appFields" : {
+						reData = service.queryAppFields(userName);
+						break;
+					}
+					case "appUserMgr" : {
+						reData = service.updateAppUserMgr(data);
+						break;
+					}
+					case "jpushId" : {
+						reData = service.updateJpushId(data);
+						break;
+					}
+					default : {
+						break;
+					}
 				}
 			}
 			catch(Exception e) {
