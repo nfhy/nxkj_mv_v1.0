@@ -138,6 +138,10 @@ public class ExposedController {
 						reData = service.updateJpushId(data);
 						break;
 					}
+					case "resetPwd" : {
+						reData = service.resetPwd(data);
+						break;
+					}
 					default : {
 						break;
 					}

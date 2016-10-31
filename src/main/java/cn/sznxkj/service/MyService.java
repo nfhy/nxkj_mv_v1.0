@@ -213,7 +213,7 @@ public class MyService implements ServiceInterface {
 		String fieldDesc = (String) data.get("fieldDesc");
 		String fieldName = (String) data.get("fieldName");
 		List devList = (List) data.get("devList");
-		List userList = (List) data.get("userList");
+		//List userList = (List) data.get("userList");
 		if (fieldIndex <= 0 || StringUtils.isEmpty(fieldName) || StringUtils.isEmpty(fieldDesc)) {
 			reMap.put("resCode", "100007");//数据格式错误
 			return reMap;
@@ -249,11 +249,11 @@ public class MyService implements ServiceInterface {
 				System.out.println(sql);
 			}
 		}
-		String sql2 = "delete from uservsfield where fieldid='"+fieldIndex+"'";
+		/*String sql2 = "delete from uservsfield where fieldid='"+fieldIndex+"'";
 		sqlList.add(sql2);
 		for (Object userName : userList) {
 			sqlList.add("insert into uservsfield(userName,fieldId) values('"+userName+"', "+fieldIndex+")");
-		}
+		}*/
 		boolean update = dao.batchUpdate(sqlList);
 		if (!update) {
 			reMap.put("resCode", "100009");//修改失败
@@ -674,6 +674,24 @@ public class MyService implements ServiceInterface {
 	private void setLoginStatus(String name, boolean isLogin) {
 		String sql = "update users set blogin=? where name=?";
 		dao.update(sql, isLogin?1:0, name);
+	}
+	/**
+	 * {"msg”:"resetPwd","data":{"token”:”xxxx” ,
+	 * ”detail”:{ “userId”:1,”name”:”zhenglei”,”nickName”:”zhenglei”,”role”:1,”tel”:”13333333”,”recvWarn”:”1”,”enable”:1}}}
+	 */
+	@Override
+	public Map resetPwd(Map data) {
+		Map<String, Object> reMap = new HashMap<>();
+		reMap.putAll(prototypeReMap);
+		if (ObjectUtils.isEmpty(data)) {
+			reMap.put("resCode", "100007");//数据格式错误
+			return reMap;
+		}
+		data = (Map) data.get("detail");
+		String userName = DataUtil.valueForKey(data, "userName");
+		String sql1 = "update users s set s.pwd='666666' where s.name=?";
+		dao.update(sql1, userName);
+		return reMap;
 	}
 
 }

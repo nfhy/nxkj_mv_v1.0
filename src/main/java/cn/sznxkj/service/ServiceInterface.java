@@ -32,4 +32,6 @@ public interface ServiceInterface {
 	
 	Map updateJpushId(Map data);
 
+	Map resetPwd(Map data);
+
 }

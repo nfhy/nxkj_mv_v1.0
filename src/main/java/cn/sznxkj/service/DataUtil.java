@@ -224,7 +224,7 @@ public class DataUtil {
 				auser.put("tel", tel);
 				auser.put("recvWarn", recvWarn);
 				auser.put("enable", enable);
-				auser.put("fieldList", fieldList.split(","));
+				auser.put("fieldList", "".equals(fieldList)? new String[]{} : fieldList.split(","));
 				auserList.add(auser);
 			}
 		}
