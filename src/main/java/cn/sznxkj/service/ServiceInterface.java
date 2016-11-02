@@ -6,7 +6,7 @@ public interface ServiceInterface {
 
 	Map queryLogin(Map data);
 
-	public Map logOut(Map data);
+	Map logOut(Map data);
 
 	Map queryWebGetDevTypeList();
 
@@ -33,5 +33,7 @@ public interface ServiceInterface {
 	Map updateJpushId(Map data);
 
 	Map resetPwd(Map data);
+
+	Map changePwd(Map data);
 
 }

@@ -142,6 +142,10 @@ public class ExposedController {
 						reData = service.resetPwd(data);
 						break;
 					}
+					case "changePwd" : {
+						reData = service.changePwd(data);
+						break;
+					}
 					default : {
 						break;
 					}

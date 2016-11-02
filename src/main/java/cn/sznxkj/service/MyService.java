@@ -689,9 +689,39 @@ public class MyService implements ServiceInterface {
 		}
 		data = (Map) data.get("detail");
 		String userName = DataUtil.valueForKey(data, "userName");
-		String sql1 = "update users s set s.pwd='666666' where s.name=?";
-		dao.update(sql1, userName);
+		changeUserPwd(userName, "666666");
 		return reMap;
+	}
+
+	/**
+	 * {"msg”:"resetPwd","data":{"token”:”xxxx” ,
+	 * ”detail”:{ “userId”:1,”name”:”zhenglei”,”nickName”:”zhenglei”,”role”:1,”tel”:”13333333”,”recvWarn”:”1”,”enable”:1}}}
+	 */
+	@Override
+	public Map changePwd(Map data) {
+		Map<String, Object> reMap = new HashMap<>();
+		reMap.putAll(prototypeReMap);
+		if (ObjectUtils.isEmpty(data)) {
+			reMap.put("resCode", "100007");//数据格式错误
+			return reMap;
+		}
+		data = (Map) data.get("detail");
+		String userName = DataUtil.valueForKey(data, "userName");
+		String oldPwd = DataUtil.valueForKey(data, "oldPwd");
+		String newPwd = DataUtil.valueForKey(data, "newPwd");
+
+		List<Map<String, Object>> userList = dao.query("SELECT u.userId,u.nickName,u.role,u.recvWarn,u.enable,u.tel FROM users u where u.name=? and u.pwd=?", userName, oldPwd);
+		if (ObjectUtils.isEmpty(userList)) {
+			reMap.put("resCode", "100016");//密码错误
+			return reMap;
+		}
+		changeUserPwd(userName, newPwd);
+		return reMap;
+	}
+
+	private void changeUserPwd(String userName, String pwd) {
+		String sql1 = "update users s set s.pwd=? where s.name=?";
+		dao.update(sql1, pwd, userName);
 	}
 
 }
